@@ -1,0 +1,116 @@
+openapi: '3.0.0'
+info:
+  version: 0.1.0
+  title: Example Web API
+servers:
+  - url: /api
+tags:
+  - name: my tag
+    description: |
+      This is my special tag
+paths:
+  /helloMessage:
+    get:
+      summary: Get hello message from server
+      operationId: getHelloMessage
+      tags:
+        - my tag
+      description: |
+        Get a special, unique hello message from the server
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: |
+            Send your name so the server can say hello
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hello message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloMessage'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /visitorBook:
+    post:
+      summary: Sign visitor book with my name
+      operationId: signVisitorBook
+      tags:
+        - my tag
+      description: |
+        Send your name to add it to the list of previous visitors
+      requestBody:
+        description: |
+          Revision descriptor for the indexed revision and the base revision to use for the delta.
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 'Visitor'
+      responses:
+        '200':
+          description: Visitor book signed
+          content:
+            application/json:
+              schema:
+                required:
+                  - visitors
+                properties:
+                  visitors:
+                    type: array
+                    items:
+                      type: string
+                      example: 'Visitor'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    delete:
+      summary: Clear visitor book
+      operationId: clearVisitorBook
+      responses:
+        '200':
+          description: Visitor book cleared
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+components:
+  responses:
+    UnexpectedError:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    HelloMessage:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: 'Hello OpenAPI'
+    Error:
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 500
+        message:
+          type: string
+          example: 'Exception occurred during request processing'
